@@ -4,7 +4,7 @@ filetype off            " required
 call plug#begin('~/.config/nvim/plugged')
     " Git integrations
     Plug 'tpope/vim-fugitive'
-    Plug 'mhinz/vim-signify' 
+    Plug 'mhinz/vim-signify'
     Plug 'tpope/vim-rhubarb'
     Plug 'junegunn/gv.vim'
     Plug 'Xuyuanp/nerdtree-git-plugin'          " Git status for nerdtree
@@ -13,6 +13,8 @@ call plug#begin('~/.config/nvim/plugged')
     "Plug 'liuchengxu/vim-which-key'
 
 
+    " Treesitter
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     " Search thing
     Plug 'preservim/nerdtree'
     Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -21,13 +23,15 @@ call plug#begin('~/.config/nvim/plugged')
     Plug 'BurntSushi/ripgrep'
 
     " Coding
-    Plug 'neoclide/coc.nvim', {'tag': 'v0.0.80'}
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
     Plug 'fatih/vim-go'
+    Plug 'peterhoeg/vim-qml'
+    Plug 'kergoth/vim-bitbake'
 
     " C/C++
     Plug 'rhysd/vim-clang-format'
-    Plug 'jackguo380/vim-lsp-cxx-highlight'
-    Plug 'octol/vim-cpp-enhanced-highlight'
+    " Plug 'jackguo380/vim-lsp-cxx-highlight'
+    " Plug 'octol/vim-cpp-enhanced-highlight'
     " Plug 'bfrg/vim-cpp-modern'
 
     " Productivity improvement
@@ -58,6 +62,8 @@ call plug#begin('~/.config/nvim/plugged')
     Plug 'preservim/nerdcommenter'
 
     Plug 'ryanoasis/vim-devicons'
+
+    Plug 'thaerkh/vim-workspace'
 call plug#end()
 
 source $HOME/.config/nvim/general/settings.vim
@@ -91,3 +97,31 @@ syntax on
 " let g:taskwiki_markup_syntax = 'markdown'
 " let g:markdown_folding = 1
 
+lua << EOF
+    require'nvim-treesitter.configs'.setup {
+        -- One of "all", "maintained" (parsers with maintainers), or a list of languages
+        ensure_installed = "maintained",
+
+        -- Install languages synchronously (only applied to `ensure_installed`)
+        sync_install = false,
+
+        -- List of parsers to ignore installing
+        ignore_install = { "javascript" },
+
+        highlight = {
+            -- `false` will disable the whole extension
+            enable = true,
+
+            -- list of language that will be disabled
+            disable = { "rust", "go"},
+
+            -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+            -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+            -- Using this option may slow down your editor, and you may see some duplicate highlights.
+            -- Instead of true it can also be a list of languages
+            additional_vim_regex_highlighting = false,
+        },
+    }
+EOF
+
+command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0) 
